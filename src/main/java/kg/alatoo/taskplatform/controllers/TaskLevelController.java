@@ -1,5 +1,7 @@
 package kg.alatoo.taskplatform.controllers;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import kg.alatoo.taskplatform.dto.task_level.TaskLevelRequest;
 import kg.alatoo.taskplatform.dto.task_level.TaskLevelResponse;
 import kg.alatoo.taskplatform.service.TaskLevelService;
@@ -20,22 +22,22 @@ public class TaskLevelController {
     }
 
     @GetMapping("/findByLevel/{level}")
-    public TaskLevelResponse findByLevel(@PathVariable String level) {
+    public TaskLevelResponse findByLevel(@PathVariable @Valid @Pattern(regexp = "easy|medium|hard")  String level) {
         return taskLevelService.findByLevel(level);
     }
 
     @PutMapping("/updateByLevel/{level}")
-    public void updateByLevel(@PathVariable String level, @RequestBody TaskLevelRequest taskLevelRequest) {
+    public void updateByLevel(@PathVariable String level, @RequestBody  @Valid TaskLevelRequest taskLevelRequest) {
         taskLevelService.updateByLevel(level, taskLevelRequest);
     }
 
     @DeleteMapping("/deleteByLevel/{level}")
-    public void deleteByLevel(@PathVariable String level) {
+    public void deleteByLevel(@PathVariable  @Valid String level) {
         taskLevelService.deleteByLevel(level);
     }
 
     @PostMapping("/create")
-    public void create(@RequestBody TaskLevelRequest taskLevelRequest) {
+    public void create(@RequestBody  @Valid TaskLevelRequest taskLevelRequest) {
         taskLevelService.create(taskLevelRequest);
     }
 }

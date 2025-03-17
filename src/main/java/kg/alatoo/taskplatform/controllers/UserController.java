@@ -1,5 +1,7 @@
 package kg.alatoo.taskplatform.controllers;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import kg.alatoo.taskplatform.dto.user.UserRequest;
 import kg.alatoo.taskplatform.dto.user.UserResponse;
 import kg.alatoo.taskplatform.service.UserDetailsService;
@@ -20,22 +22,22 @@ public class UserController {
     }
 
     @GetMapping("/findByEmail/{email}")
-    public UserResponse findByEmail(@PathVariable String email) {
+    public UserResponse findByEmail(@PathVariable @Email(message = "Invalid email format") String email) {
         return service.findByEmail(email);
     }
 
     @PutMapping("/updateByEmail/{email}")
-    public void updateByEmail(@PathVariable String email, @RequestBody UserRequest userRequest) {
+    public void updateByEmail(@PathVariable @Email(message = "Invalid email format") String email, @RequestBody @Valid UserRequest userRequest) {
         service.updateByEmail(email, userRequest);
     }
 
     @DeleteMapping("/deleteByEmail/{email}")
-    public void deleteByEmail(@PathVariable String email) {
+    public void deleteByEmail(@PathVariable @Email(message = "Invalid email format") String email) {
         service.deleteByEmail(email);
     }
 
     @PostMapping("/register")
-    public void register(@RequestBody UserRequest userRequest) {
+    public void register(@RequestBody @Valid UserRequest userRequest) {
         service.register(userRequest);
     }
 }

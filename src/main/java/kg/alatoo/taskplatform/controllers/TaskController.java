@@ -1,5 +1,7 @@
 package kg.alatoo.taskplatform.controllers;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import kg.alatoo.taskplatform.dto.task.TaskRequest;
 import kg.alatoo.taskplatform.dto.task.TaskResponse;
 import kg.alatoo.taskplatform.service.TaskService;
@@ -30,17 +32,16 @@ public class TaskController {
     }
 
     @GetMapping("/getByLevel/{level}")
-    public List<TaskResponse> getTasksByLevel(@PathVariable String level) {
+    public List<TaskResponse> getTasksByLevel(@PathVariable @Valid @Pattern(regexp = "easy|medium|hard") String level) {
         return service.getTasksByLevel(level);
     }
-
     @GetMapping("/findByName/{name}")
-    public TaskResponse findByName(@PathVariable String name) {
+    public TaskResponse findByName(@PathVariable @Valid String name) {
         return service.findByName(name);
     }
 
     @PutMapping("/updateByName/{name}")
-    public void updateByName(@PathVariable String name,@RequestBody TaskRequest taskRequest) {
+    public void updateByName(@PathVariable String name,@RequestBody @Valid TaskRequest taskRequest) {
         service.updateByName(name, taskRequest);
     }
 
@@ -50,7 +51,7 @@ public class TaskController {
     }
 
     @PostMapping("/create/{userEmail}")
-    public void create(@RequestBody TaskRequest taskRequest, @PathVariable String userEmail) {
+    public void create(@RequestBody @Valid  TaskRequest taskRequest, @PathVariable String userEmail) {
         service.create(taskRequest, userEmail);
     }
 
