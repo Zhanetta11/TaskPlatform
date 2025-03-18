@@ -38,7 +38,7 @@ public class Task {
     private String solver;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "author_email", referencedColumnName = "email")
+    @JoinColumn(name = "user_id", referencedColumnName = "email")
     private User user;
 
     @ManyToOne

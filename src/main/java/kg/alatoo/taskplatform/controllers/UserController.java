@@ -22,10 +22,9 @@ public class UserController {
     }
 
     @GetMapping("/findByEmail/{email}")
-    public UserResponse findByEmail(@PathVariable @Email(message = "Invalid email format") String email) {
+    public UserResponse findByEmail(@PathVariable String email) {
         return service.findByEmail(email);
     }
-
     @PutMapping("/updateByEmail/{email}")
     public void updateByEmail(@PathVariable @Email(message = "Invalid email format") String email, @RequestBody @Valid UserRequest userRequest) {
         service.updateByEmail(email, userRequest);
@@ -40,4 +39,5 @@ public class UserController {
     public void register(@RequestBody @Valid UserRequest userRequest) {
         service.register(userRequest);
     }
+
 }

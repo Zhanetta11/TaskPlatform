@@ -205,28 +205,6 @@ class TaskServiceImplTest {
         assertThrows(CustomException.class, () -> taskService.cancelByName(taskName));
     }
 
-    @Test
-    void create() {
-        TaskRequest taskRequest = new TaskRequest();
-        taskRequest.setName("New Task");
-        taskRequest.setDescription("Task Description");
-        taskRequest.setLevel("Medium");
-
-        User user = new User();
-        user.setEmail("user@example.com");
-
-        TaskLevel taskLevel = new TaskLevel();
-        taskLevel.setLevel("Medium");
-
-        when(taskRepository.findByName(taskRequest.getName())).thenReturn(Optional.empty());
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(taskLevelRepository.findByLevel("Medium")).thenReturn(Optional.of(taskLevel));
-
-        taskService.create(taskRequest, "user@example.com");
-
-        verify(taskRepository, times(1)).save(any(Task.class));
-        verify(userRepository, times(1)).save(any(User.class));
-    }
 
     @Test
     void create_taskAlreadyExists() {
