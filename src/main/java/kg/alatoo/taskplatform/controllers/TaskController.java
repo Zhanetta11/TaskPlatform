@@ -6,6 +6,7 @@ import kg.alatoo.taskplatform.dto.task.TaskRequest;
 import kg.alatoo.taskplatform.dto.task.TaskResponse;
 import kg.alatoo.taskplatform.service.TaskService;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class TaskController {
         return service.getAllArchivedTasks();
     }
 
+    @Validated
     @GetMapping("/getByLevel/{level}")
     public List<TaskResponse> getTasksByLevel(@PathVariable @Valid @Pattern(regexp = "easy|medium|hard") String level) {
         return service.getTasksByLevel(level);

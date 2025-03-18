@@ -5,25 +5,16 @@ import kg.alatoo.taskplatform.dto.task_level.TaskLevelResponse;
 import kg.alatoo.taskplatform.service.TaskLevelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class TaskLevelControllerTest {
-
-    private MockMvc mockMvc;
 
     @Mock
     private TaskLevelService taskLevelService;
@@ -34,69 +25,75 @@ class TaskLevelControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(taskLevelController).build();
     }
 
     @Test
-    void getAll() throws Exception {
-        when(taskLevelService.getAll()).thenReturn(Collections.emptyList());
+    void getAll() {
+        TaskLevelResponse taskLevel1 = new TaskLevelResponse();
+        taskLevel1.setId(1L);
+        taskLevel1.setLevel("easy");
+        taskLevel1.setPoint(10);
 
-        mockMvc.perform(get("/taskLevel/getAll"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        TaskLevelResponse taskLevel2 = new TaskLevelResponse();
+        taskLevel2.setId(2L);
+        taskLevel2.setLevel("medium");
+        taskLevel2.setPoint(20);
 
+        when(taskLevelService.getAll()).thenReturn(Arrays.asList(taskLevel1, taskLevel2));
+
+        assertEquals(2, taskLevelController.getAll().size());
         verify(taskLevelService, times(1)).getAll();
     }
 
     @Test
-    void findByLevel() throws Exception {
-        TaskLevelResponse response = new TaskLevelResponse();
-        response.setLevel("easy");
-        response.setPoint(10);
-        when(taskLevelService.findByLevel("easy")).thenReturn(response);
+    void findByLevel() {
+        TaskLevelResponse taskLevel = new TaskLevelResponse();
+        taskLevel.setId(1L);
+        taskLevel.setLevel("easy");
+        taskLevel.setPoint(10);
 
-        mockMvc.perform(get("/taskLevel/findByLevel/easy"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.level").value("easy"))
-                .andExpect(jsonPath("$.point").value(10));
+        when(taskLevelService.findByLevel("easy")).thenReturn(taskLevel);
 
+        TaskLevelResponse result = taskLevelController.findByLevel("easy");
+
+        assertNotNull(result);
+        assertEquals("easy", result.getLevel());
+        assertEquals(10, result.getPoint());
         verify(taskLevelService, times(1)).findByLevel("easy");
     }
 
     @Test
-    void create() throws Exception {
-        TaskLevelRequest request = new TaskLevelRequest();
-        request.setLevel("hard");
-        request.setPoint(30);
+    void updateByLevel() {
+        TaskLevelRequest taskLevelRequest = new TaskLevelRequest();
+        taskLevelRequest.setLevel("medium");
+        taskLevelRequest.setPoint(25);
 
-        mockMvc.perform(post("/taskLevel/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"level\":\"hard\",\"point\":30}"))
-                .andExpect(status().isOk());
+        doNothing().when(taskLevelService).updateByLevel(eq("easy"), eq(taskLevelRequest));
 
-        verify(taskLevelService, times(1)).create(any(TaskLevelRequest.class));
+        taskLevelController.updateByLevel("easy", taskLevelRequest);
+
+        verify(taskLevelService, times(1)).updateByLevel(eq("easy"), eq(taskLevelRequest));
     }
 
     @Test
-    void updateByLevel() throws Exception {
-        TaskLevelRequest request = new TaskLevelRequest();
-        request.setLevel("medium");
-        request.setPoint(20);
+    void deleteByLevel() {
+        doNothing().when(taskLevelService).deleteByLevel("medium");
 
-        mockMvc.perform(put("/taskLevel/updateByLevel/medium")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"level\":\"medium\",\"point\":20}"))
-                .andExpect(status().isOk());
+        taskLevelController.deleteByLevel("medium");
 
-        verify(taskLevelService, times(1)).updateByLevel(eq("medium"), any(TaskLevelRequest.class));
+        verify(taskLevelService, times(1)).deleteByLevel("medium");
     }
 
     @Test
-    void deleteByLevel() throws Exception {
-        mockMvc.perform(delete("/taskLevel/deleteByLevel/easy"))
-                .andExpect(status().isOk());
+    void create() {
+        TaskLevelRequest taskLevelRequest = new TaskLevelRequest();
+        taskLevelRequest.setLevel("hard");
+        taskLevelRequest.setPoint(30);
 
-        verify(taskLevelService, times(1)).deleteByLevel("easy");
+        doNothing().when(taskLevelService).create(taskLevelRequest);
+
+        taskLevelController.create(taskLevelRequest);
+
+        verify(taskLevelService, times(1)).create(taskLevelRequest);
     }
 }

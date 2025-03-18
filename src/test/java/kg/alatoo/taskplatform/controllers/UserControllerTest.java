@@ -8,23 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
 
-    private MockMvc mockMvc;
-
     @Mock
-    private UserDetailsService userDetailsService;
+    private UserDetailsService service;
 
     @InjectMocks
     private UserController userController;
@@ -32,65 +26,76 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    void getAll() throws Exception {
-        when(userDetailsService.getAll()).thenReturn(Collections.emptyList());
+    void getAll() {
+        UserResponse user1 = new UserResponse();
+        user1.setId(1L);
+        user1.setName("Akylai");
+        user1.setEmail("akylai@example.com");
 
-        mockMvc.perform(get("/user/getAll"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        UserResponse user2 = new UserResponse();
+        user2.setId(2L);
+        user2.setName("Akylai");
+        user2.setEmail("akylai2@example.com");
+
+        when(service.getAll()).thenReturn(Arrays.asList(user1, user2));
+
+        assertEquals(2, userController.getAll().size());
+        verify(service, times(1)).getAll();
     }
 
     @Test
-    void findByEmail() throws Exception {
-        UserResponse userResponse = new UserResponse();
-        userResponse.setEmail("test@example.com");
+    void findByEmail() {
+        UserResponse user = new UserResponse();
+        user.setId(1L);
+        user.setName("Akylai");
+        user.setEmail("akylai@example.com");
 
-        when(userDetailsService.findByEmail("test@example.com")).thenReturn(userResponse);
+        when(service.findByEmail("akylai@example.com")).thenReturn(user);
 
-        mockMvc.perform(get("/user/findByEmail/test@example.com"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("test@example.com"));
+        UserResponse result = userController.findByEmail("akylai@example.com");
+
+        assertNotNull(result);
+        assertEquals("akylai@example.com", result.getEmail());
+        verify(service, times(1)).findByEmail("akylai@example.com");
     }
 
     @Test
-    void updateByEmail() throws Exception {
+    void updateByEmail() {
         UserRequest userRequest = new UserRequest();
-        userRequest.setEmail("updated@example.com");
-        userRequest.setName("Updated Name");
-        userRequest.setPassword("password123");
+        userRequest.setName("Akylai Updated");
+        userRequest.setEmail("akylai.updated@example.com");
+        userRequest.setPassword("newpassword");
 
-        doNothing().when(userDetailsService).updateByEmail(eq("updated@example.com"), any(UserRequest.class));
+        doNothing().when(service).updateByEmail(eq("akylai@example.com"), eq(userRequest));
 
-        mockMvc.perform(put("/user/updateByEmail/updated@example.com")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Updated Name\", \"email\":\"updated@example.com\", \"password\":\"password123\"}"))
-                .andExpect(status().isOk());
+        userController.updateByEmail("akylai@example.com", userRequest);
+
+        verify(service, times(1)).updateByEmail(eq("akylai@example.com"), eq(userRequest));
     }
 
     @Test
-    void deleteByEmail() throws Exception {
-        doNothing().when(userDetailsService).deleteByEmail("test@example.com");
+    void deleteByEmail() {
+        doNothing().when(service).deleteByEmail("akylai@example.com");
 
-        mockMvc.perform(delete("/user/deleteByEmail/test@example.com"))
-                .andExpect(status().isOk());
+        userController.deleteByEmail("akylai@example.com");
+
+        verify(service, times(1)).deleteByEmail("akylai@example.com");
     }
 
     @Test
-    void register() throws Exception {
+    void register() {
         UserRequest userRequest = new UserRequest();
-        userRequest.setEmail("new@example.com");
-        userRequest.setName("New User");
-        userRequest.setPassword("password123");
+        userRequest.setName("Akylai");
+        userRequest.setEmail("akylai@example.com");
+        userRequest.setPassword("password");
 
-        doNothing().when(userDetailsService).register(any(UserRequest.class));
+        doNothing().when(service).register(userRequest);
 
-        mockMvc.perform(post("/user/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"New User\", \"email\":\"new@example.com\", \"password\":\"password123\"}"))
-                .andExpect(status().isOk());
+        userController.register(userRequest);
+
+        verify(service, times(1)).register(userRequest);
     }
 }

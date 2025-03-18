@@ -5,25 +5,16 @@ import kg.alatoo.taskplatform.dto.task.TaskResponse;
 import kg.alatoo.taskplatform.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class TaskControllerTest {
-
-    private MockMvc mockMvc;
 
     @Mock
     private TaskService taskService;
@@ -34,57 +25,110 @@ class TaskControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
     }
 
     @Test
-    void getAll() throws Exception {
-        when(taskService.getAll()).thenReturn(Collections.emptyList());
+    void getAll() {
+        List<TaskResponse> tasks = List.of(new TaskResponse(), new TaskResponse());
+        when(taskService.getAll()).thenReturn(tasks);
 
-        mockMvc.perform(get("/task/getAll"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        List<TaskResponse> result = taskController.getAll();
 
+        assertNotNull(result);
+        assertEquals(2, result.size());
         verify(taskService, times(1)).getAll();
     }
 
     @Test
-    void getAllAvailableTasks() throws Exception {
-        when(taskService.getAllAvailableTasks()).thenReturn(Collections.emptyList());
+    void getAllAvailableTasks() {
+        List<TaskResponse> tasks = List.of(new TaskResponse());
+        when(taskService.getAllAvailableTasks()).thenReturn(tasks);
 
-        mockMvc.perform(get("/task/getAllAvailableTasks"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        List<TaskResponse> result = taskController.getAllAvailableTasks();
 
+        assertNotNull(result);
+        assertEquals(1, result.size());
         verify(taskService, times(1)).getAllAvailableTasks();
     }
 
     @Test
-    void findByName() throws Exception {
-        TaskResponse taskResponse = new TaskResponse();
-        taskResponse.setName("Sample Task");
-        when(taskService.findByName("Sample Task")).thenReturn(taskResponse);
+    void getAllArchive() {
+        List<TaskResponse> tasks = List.of(new TaskResponse());
+        when(taskService.getAllArchivedTasks()).thenReturn(tasks);
 
-        mockMvc.perform(get("/task/findByName/Sample Task"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.name").value("Sample Task"));
+        List<TaskResponse> result = taskController.getAllArchive();
 
-        verify(taskService, times(1)).findByName("Sample Task");
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(taskService, times(1)).getAllArchivedTasks();
     }
 
     @Test
-    void create() throws Exception {
+    void getTasksByLevel() {
+        List<TaskResponse> tasks = List.of(new TaskResponse());
+        when(taskService.getTasksByLevel("easy")).thenReturn(tasks);
+
+        List<TaskResponse> result = taskController.getTasksByLevel("easy");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(taskService, times(1)).getTasksByLevel("easy");
+    }
+
+    @Test
+    void findByName() {
+        TaskResponse task = new TaskResponse();
+        when(taskService.findByName("taskName")).thenReturn(task);
+
+        TaskResponse result = taskController.findByName("taskName");
+
+        assertNotNull(result);
+        verify(taskService, times(1)).findByName("taskName");
+    }
+
+    @Test
+    void updateByName() {
+        TaskRequest taskRequest = new TaskRequest();
+        taskRequest.setName("Updated Task");
+        taskRequest.setDescription("Updated Description");
+        taskRequest.setLevel("medium");
+
+        doNothing().when(taskService).updateByName("taskName", taskRequest);
+
+        taskController.updateByName("taskName", taskRequest);
+
+        verify(taskService, times(1)).updateByName("taskName", taskRequest);
+    }
+
+    @Test
+    void cancelByName() {
+        doNothing().when(taskService).cancelByName("taskName");
+
+        taskController.cancelByName("taskName");
+
+        verify(taskService, times(1)).cancelByName("taskName");
+    }
+
+    @Test
+    void create() {
         TaskRequest taskRequest = new TaskRequest();
         taskRequest.setName("New Task");
-        taskRequest.setDescription("Task description");
+        taskRequest.setDescription("Task Description");
         taskRequest.setLevel("easy");
 
-        mockMvc.perform(post("/task/create/test@example.com")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"New Task\",\"description\":\"Task description\",\"level\":\"easy\"}"))
-                .andExpect(status().isOk());
+        doNothing().when(taskService).create(taskRequest, "azim@example.com");
 
-        verify(taskService, times(1)).create(any(TaskRequest.class), eq("test@example.com"));
+        taskController.create(taskRequest, "azim@example.com");
+
+        verify(taskService, times(1)).create(taskRequest, "azim@example.com");
+    }
+
+    @Test
+    void assignTaskToUser() {
+        doNothing().when(taskService).assignTaskToUser("taskName", "azim@example.com");
+
+        taskController.assignTaskToUser("taskName", "azim@example.com");
+
+        verify(taskService, times(1)).assignTaskToUser("taskName", "azim@example.com");
     }
 }
