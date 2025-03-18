@@ -12,4 +12,4 @@ public interface TaskLevelRepository extends JpaRepository<TaskLevel, Long> {
     @Transactional
     void deleteByLevel(String level);
     Optional<TaskLevel> findByLevel(String level);
-}   
+}
