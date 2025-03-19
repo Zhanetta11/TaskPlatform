@@ -6,12 +6,14 @@ import kg.alatoo.taskplatform.dto.task_level.TaskLevelRequest;
 import kg.alatoo.taskplatform.dto.task_level.TaskLevelResponse;
 import kg.alatoo.taskplatform.service.TaskLevelService;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Validated
 @RequestMapping("/taskLevel")
 public class TaskLevelController {
     private final TaskLevelService taskLevelService;

@@ -6,13 +6,14 @@ import kg.alatoo.taskplatform.dto.user.UserRequest;
 import kg.alatoo.taskplatform.dto.user.UserResponse;
 import kg.alatoo.taskplatform.service.UserDetailsService;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @AllArgsConstructor
 @RequestMapping("/user")
+@Validated
 public class UserController {
     private final UserDetailsService service;
 
@@ -22,11 +23,13 @@ public class UserController {
     }
 
     @GetMapping("/findByEmail/{email}")
-    public UserResponse findByEmail(@PathVariable String email) {
+    public UserResponse findByEmail(@PathVariable @Email(message = "Invalid email format") String email) {
         return service.findByEmail(email);
     }
+
     @PutMapping("/updateByEmail/{email}")
-    public void updateByEmail(@PathVariable @Email(message = "Invalid email format") String email, @RequestBody @Valid UserRequest userRequest) {
+    public void updateByEmail(@PathVariable @Email(message = "Invalid email format") String email,
+                              @RequestBody @Valid UserRequest userRequest) {
         service.updateByEmail(email, userRequest);
     }
 
@@ -39,5 +42,4 @@ public class UserController {
     public void register(@RequestBody @Valid UserRequest userRequest) {
         service.register(userRequest);
     }
-
 }
