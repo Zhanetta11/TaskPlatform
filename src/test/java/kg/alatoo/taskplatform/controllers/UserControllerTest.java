@@ -2,7 +2,7 @@ package kg.alatoo.taskplatform.controllers;
 
 import kg.alatoo.taskplatform.dto.user.UserRequest;
 import kg.alatoo.taskplatform.dto.user.UserResponse;
-import kg.alatoo.taskplatform.service.UserDetailsService;
+import kg.alatoo.taskplatform.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
 
     @Mock
-    private UserDetailsService service;
+    private UserService service;
 
     @InjectMocks
     private UserController userController;

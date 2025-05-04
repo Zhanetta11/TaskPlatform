@@ -5,7 +5,7 @@ import kg.alatoo.taskplatform.dto.user.UserResponse;
 
 import java.util.List;
 
-public interface UserDetailsService {
+public interface UserService {
     List<UserResponse> getAll();
     UserResponse findByEmail(String email);
     void updateByEmail(String email, UserRequest userRequest);

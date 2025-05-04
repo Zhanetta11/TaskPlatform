@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding-top: 50px; }
+        a { display: block; margin: 10px; padding: 10px; background-color: #0078D4; color: white; text-decoration: none; width: 250px; margin-left: auto; margin-right: auto; }
+        .google { background-color: #DB4437; }
+        .github { background-color: #333; }
+        .microsoft { background-color: #2F2FDF; }
+    </style>
+</head>
+<body>
+<h1>Login with:</h1>
+<a class="google" href="/oauth2/authorization/google">Google</a>
+<a class="github" href="/oauth2/authorization/github">GitHub</a>
+<br>
+<form method="post" action="/login">
+    <input type="text" name="username" placeholder="Email"><br><br>
+    <input type="password" name="password" placeholder="Password"><br><br>
+    <button type="submit">Login with Username/Password</button>
+</form>
+</body>
+</html>

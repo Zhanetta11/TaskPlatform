@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UserDetailsServiceImplTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -26,9 +27,11 @@ class UserDetailsServiceImplTest {
     @Mock
     private UserMapper userMapper;
 
-    @InjectMocks
-    private UserDetailsServiceImpl userDetailsService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
+    @InjectMocks
+    private UserServiceImpl userService;
     private User user;
     private UserRequest userRequest;
     private UserResponse userResponse;
@@ -62,7 +65,7 @@ class UserDetailsServiceImplTest {
         when(userRepository.findAll()).thenReturn(List.of(user));
         when(userMapper.toDtoS(List.of(user))).thenReturn(List.of(userResponse));
 
-        var result = userDetailsService.getAll();
+        var result = userService.getAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -74,7 +77,7 @@ class UserDetailsServiceImplTest {
         when(userRepository.findByEmail("akylai@example.com")).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userResponse);
 
-        var result = userDetailsService.findByEmail("akylai@example.com");
+        var result = userService.findByEmail("akylai@example.com");
 
         assertNotNull(result);
         assertEquals("akylai@example.com", result.getEmail());
@@ -85,7 +88,7 @@ class UserDetailsServiceImplTest {
         when(userRepository.findByEmail("akylai@example.com")).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userDetailsService.findByEmail("akylai@example.com");
+            userService.findByEmail("akylai@example.com");
         });
 
         assertEquals("User is not found with the email: akylai@example.com", exception.getMessage());
@@ -94,16 +97,19 @@ class UserDetailsServiceImplTest {
     @Test
     void updateByEmail() {
         when(userRepository.findByEmail("akylai@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("akylai.updated@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("newpassword123")).thenReturn("encodedPassword");
 
         UserRequest updatedRequest = new UserRequest();
         updatedRequest.setName("Akylai Updated");
         updatedRequest.setEmail("akylai.updated@example.com");
         updatedRequest.setPassword("newpassword123");
 
-        userDetailsService.updateByEmail("akylai@example.com", updatedRequest);
+        userService.updateByEmail("akylai@example.com", updatedRequest);
 
         assertEquals("Akylai Updated", user.getName());
         assertEquals("akylai.updated@example.com", user.getEmail());
+        assertEquals("encodedPassword", user.getPassword());
     }
 
     @Test
@@ -111,7 +117,7 @@ class UserDetailsServiceImplTest {
         when(userRepository.findByEmail("akylai@example.com")).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userDetailsService.updateByEmail("akylai@example.com", userRequest);
+            userService.updateByEmail("akylai@example.com", userRequest);
         });
 
         assertEquals("User is not found with the email: akylai@example.com", exception.getMessage());
@@ -128,7 +134,7 @@ class UserDetailsServiceImplTest {
         updatedRequest.setPassword("newpassword123");
 
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userDetailsService.updateByEmail("akylai@example.com", updatedRequest);
+            userService.updateByEmail("akylai@example.com", updatedRequest);
         });
 
         assertEquals("user with email: akylai.updated@example.com already exist!", exception.getMessage());
@@ -138,7 +144,7 @@ class UserDetailsServiceImplTest {
     void deleteByEmail() {
         when(userRepository.findByEmail("akylai@example.com")).thenReturn(Optional.of(user));
 
-        userDetailsService.deleteByEmail("akylai@example.com");
+        userService.deleteByEmail("akylai@example.com");
 
         verify(userRepository, times(1)).deleteByEmail("akylai@example.com");
     }
@@ -148,7 +154,7 @@ class UserDetailsServiceImplTest {
         when(userRepository.findByEmail("akylai@example.com")).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userDetailsService.deleteByEmail("akylai@example.com");
+            userService.deleteByEmail("akylai@example.com");
         });
 
         assertEquals("User is not found with the email: akylai@example.com", exception.getMessage());
@@ -157,8 +163,9 @@ class UserDetailsServiceImplTest {
     @Test
     void register() {
         when(userRepository.findByEmail(userRequest.getEmail())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(userRequest.getPassword())).thenReturn("encodedPassword");
 
-        userDetailsService.register(userRequest);
+        userService.register(userRequest);
 
         verify(userRepository, times(1)).save(any(User.class));
     }
