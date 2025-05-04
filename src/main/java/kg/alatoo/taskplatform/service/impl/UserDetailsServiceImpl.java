@@ -9,6 +9,7 @@ import kg.alatoo.taskplatform.repositories.UserRepository;
 import kg.alatoo.taskplatform.service.UserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserResponse> getAll() {
@@ -36,12 +38,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void updateByEmail(String email, UserRequest userRequest) {
         Optional<User> user = userRepository.findByEmail(email);
         checker(user, email);
-        if(userRepository.findByEmail(userRequest.getEmail()).isPresent() && !email.equals(userRequest.getEmail())) {
-            throw new CustomException("user with email: " + userRequest.getEmail() + " already exist!", HttpStatus.CONFLICT);
+        if (userRepository.findByEmail(userRequest.getEmail()).isPresent() && !email.equals(userRequest.getEmail())) {
+            throw new CustomException("User with email: " + userRequest.getEmail() + " already exists!", HttpStatus.CONFLICT);
         }
         user.get().setName(userRequest.getName());
         user.get().setEmail(userRequest.getEmail());
-        user.get().setPassword(userRequest.getPassword());
+        user.get().setPassword(passwordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user.get());
     }
 
@@ -57,13 +59,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
-        user.setPassword(userRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user);
     }
 
     private void checker(Optional<User> user, String email) {
         if (user.isEmpty()) {
-            throw new CustomException("User is not found with the email: " + email, HttpStatus.NOT_FOUND);
+            throw new CustomException("User not found with email: " + email, HttpStatus.NOT_FOUND);
         }
     }
 }

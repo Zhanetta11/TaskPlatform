@@ -1,5 +1,6 @@
 package kg.alatoo.taskplatform.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import kg.alatoo.taskplatform.dto.user.UserRequest;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/user")
+@SecurityRequirement(name = "basicAuth")
 @Validated
 public class UserController {
     private final UserDetailsService service;

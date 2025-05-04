@@ -1,13 +1,13 @@
-package kg.alatoo.taskplatform;
+	package kg.alatoo.taskplatform;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+	import org.springframework.boot.SpringApplication;
+	import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class TaskPlatformApplication {
+	@SpringBootApplication
+	public class TaskPlatformApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TaskPlatformApplication.class, args);
+		public static void main(String[] args) {
+			SpringApplication.run(TaskPlatformApplication.class, args);
+		}
+
 	}
-
-}

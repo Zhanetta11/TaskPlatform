@@ -1,5 +1,6 @@
 package kg.alatoo.taskplatform.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import kg.alatoo.taskplatform.dto.task.TaskRequest;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/task")
+@SecurityRequirement(name = "basicAuth")
 @Validated
 public class TaskController {
     private final TaskService service;
