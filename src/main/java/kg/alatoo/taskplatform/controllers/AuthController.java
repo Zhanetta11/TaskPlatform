@@ -1,40 +1,35 @@
 package kg.alatoo.taskplatform.controllers;
 
+import kg.alatoo.taskplatform.entities.RefreshToken;
+import kg.alatoo.taskplatform.entities.User;
+import kg.alatoo.taskplatform.repositories.RefreshTokenRepository;
 import kg.alatoo.taskplatform.security.JwtTokenProvider;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    public AuthController(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostMapping("/refresh")
-    public Map<String, String> refreshToken(@RequestParam String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token");
-        }
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
 
-        String email = jwtTokenProvider.getEmail(refreshToken);
+        String refreshTokenStr = request.get("refresh_token");
 
-        String role;
-        try {
-            role = jwtTokenProvider.getRole(refreshToken);
-        } catch (Exception e) {
-            role = "USER";
-        }
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new RuntimeException("Refresh token is invalid or expired"));
 
-        String newAccessToken = jwtTokenProvider.createAccessToken(email, role);
+        User user = refreshToken.getUser();
 
-        return Map.of("accessToken", newAccessToken);
+        String newAccessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole());
+
+        return ResponseEntity.ok(Map.of("access_token", newAccessToken));
     }
 }
