@@ -1,6 +1,7 @@
 package kg.alatoo.taskplatform.service.impl;
 
 import kg.alatoo.taskplatform.service.UserService;
+import kg.alatoo.taskplatform.service.TwoFactorAuthService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,6 +28,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final TwoFactorAuthService twoFactorAuthService; // <<<<<< добавлено
 
     @Override
     public List<UserResponse> getAll() {
@@ -86,5 +88,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .password(user.getPassword())
                 .roles(user.getRole().toUpperCase())
                 .build();
+    }
+
+    public void enable2FA(String email, String secret) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        user.setTwoFactorSecret(secret);
+        user.setTwoFactorEnabled(true);
+        userRepository.save(user);
+    }
+
+    public boolean verify2FACode(String email, int code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        if (!user.isTwoFactorEnabled()) {
+            return true;
+        }
+        return twoFactorAuthService.verifyCode(user.getTwoFactorSecret(), code);
     }
 }

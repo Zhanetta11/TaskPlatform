@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 @RequestMapping("/taskLevel")
-@SecurityRequirement(name = "basicAuth")
+@SecurityRequirement(name = "bearerAuth")
 public class TaskLevelController {
     private final TaskLevelService taskLevelService;
 

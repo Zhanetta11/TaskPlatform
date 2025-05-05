@@ -1,5 +1,6 @@
 package kg.alatoo.taskplatform.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import kg.alatoo.taskplatform.dto.user.UserRequest;
 import kg.alatoo.taskplatform.service.UserService;
 import lombok.RequiredArgsConstructor;

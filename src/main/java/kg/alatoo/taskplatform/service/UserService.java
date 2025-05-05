@@ -11,4 +11,8 @@ public interface UserService {
     void updateByEmail(String email, UserRequest userRequest);
     void deleteByEmail(String email);
     void register(UserRequest userRequest);
+
+    void enable2FA(String email, String secret);
+
+    boolean verify2FACode(String email, int code);
 }

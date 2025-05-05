@@ -1,5 +1,6 @@
 package kg.alatoo.taskplatform.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import kg.alatoo.taskplatform.entities.RefreshToken;
 import kg.alatoo.taskplatform.entities.User;
 import kg.alatoo.taskplatform.repositories.RefreshTokenRepository;
