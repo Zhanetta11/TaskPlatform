@@ -41,8 +41,8 @@ public class UserController {
         userService.deleteByEmail(email);
     }
 
-    @PostMapping("/register")
-    public void register(@RequestBody @Valid UserRequest userRequest) {
-        userService.register(userRequest);
-    }
+//    @PostMapping("/register")
+//    public void register(@RequestBody @Valid UserRequest userRequest) {
+//        userService.register(userRequest);
+//    }
 }

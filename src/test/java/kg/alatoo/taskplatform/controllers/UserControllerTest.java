@@ -84,17 +84,17 @@ class UserControllerTest {
         verify(service, times(1)).deleteByEmail("akylai@example.com");
     }
 
-    @Test
-    void register() {
-        UserRequest userRequest = new UserRequest();
-        userRequest.setName("Akylai");
-        userRequest.setEmail("akylai@example.com");
-        userRequest.setPassword("password");
-
-        doNothing().when(service).register(userRequest);
-
-        userController.register(userRequest);
-
-        verify(service, times(1)).register(userRequest);
-    }
+//    @Test
+//    void register() {
+//        UserRequest userRequest = new UserRequest();
+//        userRequest.setName("Akylai");
+//        userRequest.setEmail("akylai@example.com");
+//        userRequest.setPassword("password");
+//
+//        doNothing().when(service).register(userRequest);
+//
+//        userController.register(userRequest);
+//
+//        verify(service, times(1)).register(userRequest);
+//    }
 }
